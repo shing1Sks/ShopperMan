@@ -25,7 +25,9 @@ export default function VoiceCallCard({ productUrl }: { productUrl: string }) {
         `${process.env.NEXT_PUBLIC_API_URL}/start-call`,
         {
           phone_number: phone,
-          product_link: productUrl,
+          product_link:
+            productUrl ||
+            "https://www.boat-lifestyle.com/products/rockerz-430-headphone?variant=41533788389474&country=IN&currency=INR&gad_source=1&gad_campaignid=21719598133&gbraid=0AAAAADCnhlwa8guLC5fUr__8wervLVvMc&gclid=Cj0KCQjwyIPDBhDBARIsAHJyyViMZRnE0zqCMopM8RhhazGDSkUCyp29CwR6IV3CAzRzPX5KoAOUMBUaAuB7EALw_wcB",
           user_doubt: "User has some questions about this product.",
         }
       );

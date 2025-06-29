@@ -33,11 +33,26 @@ import {
 import { useChat } from "ai/react";
 import ProductAnalysis from "@/components/ProductAnalysis";
 import VoiceCallCard from "@/components/VoiceCallCard";
+import ChatTab from "../components/ChatTab";
+import ConciergeTab from "@/components/ConciergeTab";
 
 export default function ShopperManApp() {
   const [productUrl, setProductUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [productData, setProductData] = useState(null);
+
+  const dummyOrders = [
+    { id: "12345", name: "iPhone 15 Pro Max" },
+    { id: "12346", name: "MacBook Air M3" },
+    { id: "12347", name: "Sony WH-1000XM5 Headphones" },
+  ];
+
+  const [supportStep, setSupportStep] = useState<
+    "idle" | "select" | "issue" | "submitted"
+  >("idle");
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [issueText, setIssueText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat({
@@ -359,218 +374,17 @@ export default function ShopperManApp() {
 
             {/* AI Agent Chat Tab */}
             <TabsContent value="chat" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="lg:col-span-2 border-0 shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                      <MessageCircle className="w-5 h-5 text-blue-600" />
-                      <span>Chat with AI Shopping Assistant</span>
-                    </CardTitle>
-                    <CardDescription>
-                      Get instant answers about products, comparisons, and
-                      shopping advice
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-96 border rounded-lg p-4 overflow-y-auto mb-4 bg-gray-50">
-                      {messages.length === 0 ? (
-                        <div className="text-center text-gray-500 mt-20">
-                          <Bot className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                          <p>
-                            Hi! I'm your AI shopping assistant. Ask me anything
-                            about products!
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {messages.map((message) => (
-                            <div
-                              key={message.id}
-                              className={`flex ${
-                                message.role === "user"
-                                  ? "justify-end"
-                                  : "justify-start"
-                              }`}
-                            >
-                              <div
-                                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                                  message.role === "user"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-white border shadow-sm"
-                                }`}
-                              >
-                                {message.content}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <form onSubmit={handleSubmit} className="flex space-x-2">
-                      <Input
-                        value={input}
-                        onChange={handleInputChange}
-                        placeholder="Ask about products, prices, comparisons..."
-                        disabled={isLoading}
-                      />
-                      <Button
-                        type="submit"
-                        disabled={isLoading}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600"
-                      >
-                        Send
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
-
-                <div className="space-y-4">
-                  <VoiceCallCard productUrl={productUrl} />
-
-                  <Card className="border-0 shadow-lg">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Quick Actions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start bg-transparent"
-                      >
-                        <Search className="w-4 h-4 mr-2" />
-                        Find similar products
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start bg-transparent"
-                      >
-                        <TrendingUp className="w-4 h-4 mr-2" />
-                        Price comparison
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start bg-transparent"
-                      >
-                        <Star className="w-4 h-4 mr-2" />
-                        Check reviews
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
+              <ChatTab
+                productSummary={
+                  productData?.summary || "Wireless Bluetooth Headphones"
+                }
+                productUrl={productUrl}
+              />
             </TabsContent>
 
             {/* Private Concierge Tab */}
             <TabsContent value="concierge" className="space-y-6">
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <UserCheck className="w-5 h-5 text-purple-600" />
-                    <span>Private Shopping Concierge</span>
-                  </CardTitle>
-                  <CardDescription>
-                    Let our AI handle seller communications and custom requests
-                    for you
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">
-                          Automated Seller Contact
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <p className="text-sm text-gray-600">
-                          We'll automatically reach out to sellers on your
-                          behalf for:
-                        </p>
-                        <ul className="space-y-2 text-sm">
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                            Price negotiations
-                          </li>
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                            Custom specifications
-                          </li>
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                            Bulk order inquiries
-                          </li>
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                            Shipping arrangements
-                          </li>
-                        </ul>
-                        <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                          Set Up Concierge
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">
-                          Custom Requests
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <p className="text-sm text-gray-600">
-                          Submit special requests and we'll handle the legwork:
-                        </p>
-                        <div className="space-y-3">
-                          <Input placeholder="Describe your custom need..." />
-                          <Input placeholder="Budget range (optional)" />
-                          <Input placeholder="Timeline requirements" />
-                        </div>
-                        <Button
-                          className="w-full bg-transparent"
-                          variant="outline"
-                        >
-                          Submit Request
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <Card className="mt-6">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Active Requests</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <h5 className="font-medium">
-                              Custom laptop configuration
-                            </h5>
-                            <p className="text-sm text-gray-600">
-                              Negotiating with 3 sellers
-                            </p>
-                          </div>
-                          <Badge className="bg-yellow-100 text-yellow-800">
-                            In Progress
-                          </Badge>
-                        </div>
-                        <div className="flex items-center justify-between p-3 border rounded-lg">
-                          <div>
-                            <h5 className="font-medium">
-                              Bulk office chairs order
-                            </h5>
-                            <p className="text-sm text-gray-600">
-                              Awaiting quotes
-                            </p>
-                          </div>
-                          <Badge className="bg-blue-100 text-blue-800">
-                            Pending
-                          </Badge>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CardContent>
-              </Card>
+              <ConciergeTab />
             </TabsContent>
 
             {/* Post-Sales Support Tab */}
@@ -676,22 +490,106 @@ export default function ShopperManApp() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h5 className="font-medium">
-                            Need help with a purchase?
-                          </h5>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <LifeBuoy className="w-4 h-4 mr-2" />
-                            Get Support
-                          </Button>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Our AI will automatically find the right support
-                          contacts and reach out on your behalf
-                        </p>
+                        {supportStep === "idle" && (
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-medium">
+                              Need help with a purchase?
+                            </h5>
+                            <Button
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                              onClick={() => setSupportStep("select")}
+                            >
+                              <LifeBuoy className="w-4 h-4 mr-2" />
+                              Get Support
+                            </Button>
+                          </div>
+                        )}
+
+                        {supportStep === "select" && (
+                          <div className="space-y-4">
+                            <label className="text-sm font-medium">
+                              Select a product
+                            </label>
+                            <select
+                              className="w-full border rounded p-2"
+                              value={selectedItem ?? ""}
+                              onChange={(e) => setSelectedItem(e.target.value)}
+                            >
+                              <option value="">-- Select --</option>
+                              {dummyOrders.map((item) => (
+                                <option key={item.id} value={item.name}>
+                                  {item.name}
+                                </option>
+                              ))}
+                            </select>
+                            {selectedItem && (
+                              <Button
+                                onClick={() => setSupportStep("issue")}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                Next
+                              </Button>
+                            )}
+                          </div>
+                        )}
+
+                        {supportStep === "issue" && (
+                          <div className="space-y-4">
+                            <p className="text-sm text-gray-600">
+                              Describe your issue with{" "}
+                              <strong>{selectedItem}</strong>
+                            </p>
+                            <textarea
+                              className="w-full h-24 border rounded p-2"
+                              value={issueText}
+                              onChange={(e) => setIssueText(e.target.value)}
+                              placeholder="Explain what's wrong, e.g. 'Device won't turn on'"
+                            />
+                            <Button
+                              disabled={!issueText.trim() || isSubmitting}
+                              onClick={async () => {
+                                setIsSubmitting(true);
+                                try {
+                                  await fetch(
+                                    `${process.env.NEXT_PUBLIC_API_URL}/concierge`,
+                                    {
+                                      method: "POST",
+                                      headers: {
+                                        "Content-Type": "application/json",
+                                      },
+                                      body: JSON.stringify({
+                                        custom_need: `Support request for ${selectedItem}: ${issueText}`,
+                                        budget_range: "N/A",
+                                        timeline:
+                                          "Urgent support needed for selected order",
+                                      }),
+                                    }
+                                  );
+                                  setSupportStep("submitted");
+                                } catch (err) {
+                                  alert(
+                                    "Support request failed. Please try again."
+                                  );
+                                } finally {
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              {isSubmitting
+                                ? "Submitting..."
+                                : "Initiate Support"}
+                            </Button>
+                          </div>
+                        )}
+
+                        {supportStep === "submitted" && (
+                          <div className="p-3 border rounded-lg bg-green-50 text-green-700">
+                            ✅ Your support request has been sent. Our AI
+                            concierge is on it!
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
