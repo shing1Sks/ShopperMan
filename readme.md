@@ -54,6 +54,7 @@ cd shopperman-frontend
 
 npm install
 
+setup env -
 VITE_API_URL=backend-hosted-url
 
 npm run dev
