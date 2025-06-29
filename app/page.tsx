@@ -43,40 +43,25 @@ export default function ShopperManApp() {
       api: "/api/chat",
     });
 
-  const handleAnalyze = () => {
-    if (productUrl.trim()) {
-      setIsAnalyzing(true);
-      // Simulate analysis
-      setTimeout(() => {
-        setIsAnalyzing(false);
-        document
-          .getElementById("results")
-          ?.scrollIntoView({ behavior: "smooth" });
-      }, 2000);
-    }
-  };
-
-  const handleProductAnalysis = async () => {
+  const handleAnalyze = async () => {
     if (!productUrl.trim()) return;
 
     setIsAnalyzing(true);
-    // Simulate API call for product analysis
-    setTimeout(() => {
-      setProductData({
-        name: "Apple iPhone 15 Pro Max",
-        price: "$1,199",
-        rating: 4.8,
-        summary:
-          "Latest flagship iPhone with titanium design, A17 Pro chip, and advanced camera system.",
-        pros: ["Excellent camera quality", "Premium build", "Fast performance"],
-        cons: ["Expensive", "No USB-C to Lightning adapter included"],
-        alternatives: [
-          { name: "Samsung Galaxy S24 Ultra", price: "$1,299", rating: 4.7 },
-          { name: "Google Pixel 8 Pro", price: "$999", rating: 4.6 },
-        ],
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: productUrl }),
       });
+
+      const json = await res.json();
+      console.log("Analysis:", json);
+      setProductData(json.summary);
+    } catch (error) {
+      console.error("Analyze error:", error);
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -195,7 +180,7 @@ export default function ShopperManApp() {
         </div>
       </section>
 
-      <ProductAnalysis />
+      <ProductAnalysis productData={productData} />
 
       {/* Main App Interface */}
       <section className="py-12 px-4">
