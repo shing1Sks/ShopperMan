@@ -1,5 +1,11 @@
 import React from "react";
-import { Star, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  Star,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
+  ImageIcon,
+} from "lucide-react";
 
 interface Alternative {
   title: string;

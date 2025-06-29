@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useChat } from "ai/react";
 import ProductAnalysis from "@/components/ProductAnalysis";
+import VoiceCallCard from "@/components/VoiceCallCard";
 
 export default function ShopperManApp() {
   const [productUrl, setProductUrl] = useState("");
@@ -424,23 +425,7 @@ export default function ShopperManApp() {
                 </Card>
 
                 <div className="space-y-4">
-                  <Card className="border-0 shadow-lg">
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2 text-lg">
-                        <Phone className="w-5 h-5 text-green-600" />
-                        <span>Voice Call</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Prefer talking? Start a voice call with our AI agent
-                      </p>
-                      <Button className="w-full bg-green-600 hover:bg-green-700">
-                        <Phone className="w-4 h-4 mr-2" />
-                        Start Voice Call
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <VoiceCallCard productUrl={productUrl} />
 
                   <Card className="border-0 shadow-lg">
                     <CardHeader>
